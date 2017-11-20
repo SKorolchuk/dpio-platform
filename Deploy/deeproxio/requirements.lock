@@ -1,0 +1,6 @@
+dependencies:
+- name: stolon
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 0.4.3
+digest: sha256:2f449d429a6498527ea0320c32bfd473b8771cf36942e00b6d873237e3141e7a
+generated: 2019-01-09T00:24:14.0579165+03:00

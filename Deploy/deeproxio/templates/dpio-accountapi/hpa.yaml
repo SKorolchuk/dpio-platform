@@ -1,0 +1,16 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{ include "deeproxio.accountapi.fullname" . }}-hpa"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    name: {{ include "deeproxio.accountapi.fullname" . }}
+  minReplicas: {{ .Values.dpioAccountApi.image.minReplicaCount }}
+  maxReplicas: {{ .Values.dpioAccountApi.image.maxReplicaCount }}
+{{- with .Values.dpioAccountApi.metrics }}
+  metrics:
+  {{- toYaml . | nindent 8 }}
+{{- end }}
+  

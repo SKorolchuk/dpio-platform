@@ -1,0 +1,16 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: []
+name: $(BuildDefinitionName).$(DayOfYear)$(Rev:.r)
+pool:
+  vmImage: 'windows-2019'
+steps:
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: tf-aks-deploy-stack'
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/Deploy/terraform'
+    ArtifactName: 'tf-aks-stack'
+

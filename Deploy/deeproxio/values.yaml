@@ -1,0 +1,109 @@
+# Default values for deeproxio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+dpioApplication:
+  name: dpio-application
+  containerPort: 44301
+  host: deeprox.io
+  production: true
+  service:
+    port: 4400
+    type: LoadBalancer
+    labels: {}
+    annotations:
+      traefik.ingress.kubernetes.io/affinity: true
+      traefik.ingress.kubernetes.io/load-balancer-method: drr
+      traefik.ingress.kubernetes.io/session-cookie-name: lb-application-cookie
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 30
+  - type: Pods
+    pods:
+      metricName: packets-per-second
+      targetAverageValue: 250
+  resources:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+    requests:
+      cpu: "100m"
+      memory: "96Mi"
+  image:
+    minReplicaCount: 2
+    maxReplicaCount: 10
+    registry: 192.168.2.128:5000
+    repository: dpio-application
+    tag: latest
+    pullPolicy: Always
+dpioAccountApi:
+  name: dpio-accountapi
+  containerPort: 80
+  host: auth.deeprox.io
+  secretKey: "iNivDmHLpUA223sqsfhqGbMRdRj1PVkH"
+  accountDBName: "DpioAccountDB"
+  jwt:
+    audience: "webApi"
+    issuer: "http://auth.deeprox.io/"
+  production: true
+  service:
+    port: 4300
+    type: LoadBalancer
+    labels: {}
+    annotations:
+      traefik.ingress.kubernetes.io/affinity: true
+      traefik.ingress.kubernetes.io/load-balancer-method: drr
+      traefik.ingress.kubernetes.io/session-cookie-name: lb-account-cookie
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 30
+  - type: Pods
+    pods:
+      metricName: packets-per-second
+      targetAverageValue: 250
+  resources:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+    requests:
+      cpu: "100m"
+      memory: "96Mi"
+  image:
+    minReplicaCount: 2
+    maxReplicaCount: 10
+    registry: 192.168.2.128:5000
+    repository: dpio-accountapi
+    migrationRepository: dpio-accountapi-migration
+    tag: latest
+    pullPolicy: Always
+
+ingress:
+  type: traefik
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+prometheus:
+  enabled: true
+  pushgateway:
+    url: "prometheus-pushgateway.monitoring:9091"
+postgres:
+  service: "postgresql-ha-stolon-proxy.default"
+  port: 5432
+  username: "stolon"
+  password: "12345678"
+
+rbac:
+  enabled: true
+
+dependencies:
+  enabled: false

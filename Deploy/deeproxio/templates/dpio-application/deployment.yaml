@@ -1,0 +1,94 @@
+{{- if semverCompare "^1.9-0" .Capabilities.KubeVersion.GitVersion }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "deeproxio.application.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "deeproxio.application.name" . }}
+    helm.sh/chart: {{ include "deeproxio.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    ingress.type: {{ .Values.ingress.type }}
+spec:
+  replicas: {{ .Values.dpioApplication.image.minReplicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "deeproxio.application.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "deeproxio.application.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if .Values.rbac.enabled }}
+      serviceAccountName: {{ template "deeproxio.application.fullname" . }}
+      {{- else }}
+      serviceAccountName: default
+      {{- end }}
+      containers:
+        - name: {{ include "deeproxio.application.name" . }}
+          image: "{{ .Values.dpioApplication.image.registry }}/{{ .Values.dpioApplication.image.repository }}:{{ .Values.dpioApplication.image.tag }}"
+          imagePullPolicy: {{ .Values.dpioApplication.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.dpioApplication.containerPort }}
+              protocol: TCP
+          env:
+            - name: AUTH_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: auth.endpoint
+            - name: APP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: app.endpoint
+            - name: VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: version
+            - name: PRODUCTION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: isProduction
+            - name: DEFAULT_LANGUAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: defaultLanguage
+            - name: SUPPORTED_LANGUAGES
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: supportedLanguages
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "deeproxio.application.fullname" . }}
+                  key: applicationPort
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              initialDelaySeconds: 45
+              periodSeconds: 10
+              timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.dpioApplication.resources | nindent 12 }}
+      {{- with .Values.dpioApplication.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.dpioApplication.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.dpioApplication.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}

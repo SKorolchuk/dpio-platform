@@ -1,0 +1,6 @@
+dependencies:
+  - name: stolon
+    version: 0.4.3
+    repository: https://kubernetes-charts.storage.googleapis.com
+    alias: postgres-ha-cluster
+    condition: dependencies.enabled,global.dependencies.enabled

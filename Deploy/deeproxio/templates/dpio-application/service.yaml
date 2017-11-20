@@ -1,0 +1,31 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "deeproxio.application.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "deeproxio.application.name" . }}
+    helm.sh/chart: {{ include "deeproxio.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- if .Values.dpioApplication.service }}
+  {{- range $key, $value := .Values.dpioApplication.service.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- end }}
+  annotations:
+    {{- if .Values.dpioApplication.service }}
+    {{- range $key, $value := .Values.dpioApplication.service.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    {{- end }}
+spec:
+  type: {{ .Values.dpioApplication.service.type }}
+  ports:
+    - port: {{ .Values.dpioApplication.service.port }}
+      targetPort: {{ .Values.dpioApplication.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "deeproxio.application.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
