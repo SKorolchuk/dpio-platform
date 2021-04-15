@@ -1,0 +1,75 @@
+affinity: {}
+apiService:
+  create: true
+command:
+- metrics-server
+- --kubelet-insecure-tls
+common:
+  exampleValue: common-chart
+  global: {}
+containerSecurityContext:
+  enabled: true
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+customLivenessProbe: {}
+customReadinessProbe: {}
+extraArgs:
+  cert-dir: /tmp
+  kubelet-insecure-tls: null
+  kubelet-preferred-address-types: InternalIP,ExternalIP,Hostname
+  kubelet-use-node-status-port: null
+  secure-port: 4443
+hostAliases: []
+hostNetwork: false
+image:
+  pullPolicy: IfNotPresent
+  registry: docker.io
+  repository: bitnami/metrics-server
+  tag: 0.4.2-debian-10-r30
+livenessProbe:
+  enabled: true
+  failureThreshold: 3
+  httpGet:
+    path: /livez
+    port: https
+    scheme: HTTPS
+  periodSeconds: 10
+nodeAffinityPreset:
+  key: ""
+  type: ""
+  values: []
+nodeSelector: {}
+podAffinityPreset: ""
+podAnnotations: {}
+podAntiAffinityPreset: soft
+podDisruptionBudget:
+  enabled: false
+  maxUnavailable: null
+  minAvailable: null
+podLabels: {}
+podSecurityContext:
+  enabled: false
+rbac:
+  create: true
+readinessProbe:
+  enabled: true
+  failureThreshold: 3
+  httpGet:
+    path: /readyz
+    port: https
+    scheme: HTTPS
+  periodSeconds: 10
+replicas: 1
+resources:
+  limits: {}
+  requests: {}
+securePort: 4443
+service:
+  annotations: {}
+  labels: {}
+  port: 443
+  type: ClusterIP
+serviceAccount:
+  create: true
+tolerations: []
+topologySpreadConstraints: []

@@ -1,0 +1,360 @@
+caSecretName: ""
+chartmuseum:
+  absoluteUrl: false
+  affinity: {}
+  enabled: true
+  image:
+    repository: goharbor/chartmuseum-photon
+    tag: v2.2.0
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  serviceAccountName: ""
+  tolerations: []
+core:
+  affinity: {}
+  image:
+    repository: goharbor/harbor-core
+    tag: v2.2.0
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  secret: ""
+  secretName: ""
+  serviceAccountName: ""
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 10
+  tolerations: []
+  xsrfKey: ""
+database:
+  external:
+    coreDatabase: registry
+    host: 192.168.0.1
+    notaryServerDatabase: notary_server
+    notarySignerDatabase: notary_signer
+    password: password
+    port: "5432"
+    sslmode: disable
+    username: user
+  internal:
+    affinity: {}
+    image:
+      repository: goharbor/harbor-db
+      tag: v2.2.0
+    nodeSelector: {}
+    password: changeit
+    serviceAccountName: ""
+    tolerations: []
+  maxIdleConns: 50
+  maxOpenConns: 1000
+  podAnnotations: {}
+  type: internal
+exporter:
+  affinity: {}
+  cacheCleanInterval: 14400
+  cacheDuration: 30
+  image:
+    repository: goharbor/harbor-exporter
+    tag: v2.2.0
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  serviceAccountName: ""
+  tolerations: []
+expose:
+  clusterIP:
+    name: harbor
+    ports:
+      httpPort: 80
+      httpsPort: 443
+      notaryPort: 4443
+  ingress:
+    annotations:
+      ingress.kubernetes.io/proxy-body-size: "0"
+      ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    controller: default
+    hosts:
+      core: core.harbor.domain
+      notary: notary.harbor.domain
+  loadBalancer:
+    IP: ""
+    annotations: {}
+    name: harbor
+    ports:
+      httpPort: 80
+      httpsPort: 443
+      notaryPort: 4443
+    sourceRanges: []
+  nodePort:
+    name: harbor
+    ports:
+      http:
+        nodePort: 30002
+        port: 80
+      https:
+        nodePort: 30003
+        port: 443
+      notary:
+        nodePort: 30004
+        port: 4443
+  tls:
+    auto:
+      commonName: ""
+    certSource: auto
+    enabled: true
+    secret:
+      notarySecretName: ""
+      secretName: ""
+  type: ingress
+externalURL: https://core.harbor.domain
+harborAdminPassword: "12345678"
+imagePullPolicy: IfNotPresent
+internalTLS:
+  certSource: auto
+  chartmuseum:
+    crt: ""
+    key: ""
+    secretName: ""
+  core:
+    crt: ""
+    key: ""
+    secretName: ""
+  enabled: false
+  jobservice:
+    crt: ""
+    key: ""
+    secretName: ""
+  portal:
+    crt: ""
+    key: ""
+    secretName: ""
+  registry:
+    crt: ""
+    key: ""
+    secretName: ""
+  trivy:
+    crt: ""
+    key: ""
+    secretName: ""
+  trustCa: ""
+jobservice:
+  affinity: {}
+  image:
+    repository: goharbor/harbor-jobservice
+    tag: v2.2.0
+  jobLoggers:
+  - file
+  maxJobWorkers: 10
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  secret: ""
+  serviceAccountName: ""
+  tolerations: []
+logLevel: info
+metrics:
+  core:
+    path: /metrics
+    port: 8001
+  enabled: false
+  exporter:
+    path: /metrics
+    port: 8001
+  registry:
+    path: /metrics
+    port: 8001
+nginx:
+  affinity: {}
+  image:
+    repository: goharbor/nginx-photon
+    tag: v2.2.0
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  serviceAccountName: ""
+  tolerations: []
+notary:
+  enabled: true
+  secretName: ""
+  server:
+    affinity: {}
+    image:
+      repository: goharbor/notary-server-photon
+      tag: v2.2.0
+    nodeSelector: {}
+    podAnnotations: {}
+    replicas: 1
+    serviceAccountName: ""
+    tolerations: []
+  signer:
+    affinity: {}
+    image:
+      repository: goharbor/notary-signer-photon
+      tag: v2.2.0
+    nodeSelector: {}
+    podAnnotations: {}
+    replicas: 1
+    serviceAccountName: ""
+    tolerations: []
+persistence:
+  enabled: true
+  imageChartStorage:
+    azure:
+      accountkey: base64encodedaccountkey
+      accountname: accountname
+      container: containername
+    disableredirect: false
+    filesystem:
+      rootdirectory: /storage
+    gcs:
+      bucket: bucketname
+      encodedkey: base64-encoded-json-key-file
+    oss:
+      accesskeyid: accesskeyid
+      accesskeysecret: accesskeysecret
+      bucket: bucketname
+      region: regionname
+    s3:
+      bucket: bucketname
+      region: us-west-1
+    swift:
+      authurl: https://storage.myprovider.com/v3/auth
+      container: containername
+      password: password
+      username: username
+    type: filesystem
+  persistentVolumeClaim:
+    chartmuseum:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 5Gi
+      storageClass: ""
+      subPath: ""
+    database:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 1Gi
+      storageClass: ""
+      subPath: ""
+    jobservice:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 1Gi
+      storageClass: ""
+      subPath: ""
+    redis:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 1Gi
+      storageClass: ""
+      subPath: ""
+    registry:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 5Gi
+      storageClass: ""
+      subPath: ""
+    trivy:
+      accessMode: ReadWriteOnce
+      existingClaim: ""
+      size: 5Gi
+      storageClass: ""
+      subPath: ""
+  resourcePolicy: keep
+portal:
+  affinity: {}
+  image:
+    repository: goharbor/harbor-portal
+    tag: v2.2.0
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  serviceAccountName: ""
+  tolerations: []
+proxy:
+  components:
+  - core
+  - jobservice
+  - trivy
+  noProxy: 127.0.0.1,localhost,.local,.internal
+redis:
+  external:
+    addr: 192.168.0.2:6379
+    chartmuseumDatabaseIndex: "3"
+    coreDatabaseIndex: "0"
+    jobserviceDatabaseIndex: "1"
+    password: ""
+    registryDatabaseIndex: "2"
+    sentinelMasterSet: ""
+    trivyAdapterIndex: "5"
+  internal:
+    affinity: {}
+    image:
+      repository: goharbor/redis-photon
+      tag: v2.2.0
+    nodeSelector: {}
+    serviceAccountName: ""
+    tolerations: []
+  podAnnotations: {}
+  type: internal
+registry:
+  affinity: {}
+  controller:
+    image:
+      repository: goharbor/harbor-registryctl
+      tag: v2.2.0
+  credentials:
+    htpasswd: harbor_registry_user:$2y$10$9L4Tc0DJbFFMB6RdSCunrOpTHdwhid4ktBJmLD00bYgqkkGOvll3m
+    password: harbor_registry_password
+    username: harbor_registry_user
+  middleware:
+    cloudFront:
+      baseurl: example.cloudfront.net
+      duration: 3000s
+      ipfilteredby: none
+      keypairid: KEYPAIRID
+      privateKeySecret: my-secret
+    enabled: false
+    type: cloudFront
+  nodeSelector: {}
+  podAnnotations: {}
+  registry:
+    image:
+      repository: goharbor/registry-photon
+      tag: v2.2.0
+  relativeurls: false
+  replicas: 1
+  secret: ""
+  serviceAccountName: ""
+  tolerations: []
+secretKey: not-a-secure-key
+trivy:
+  affinity: {}
+  debugMode: false
+  enabled: true
+  gitHubToken: ""
+  ignoreUnfixed: false
+  image:
+    repository: goharbor/trivy-adapter-photon
+    tag: v2.2.0
+  insecure: false
+  nodeSelector: {}
+  podAnnotations: {}
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  serviceAccountName: ""
+  severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+  skipUpdate: false
+  tolerations: []
+  vulnType: os,library
+updateStrategy:
+  type: RollingUpdate

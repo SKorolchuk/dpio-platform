@@ -1,0 +1,83 @@
+name: dpio-core-infrastructure-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  paths:
+    include:
+    - local-baremetal/core/*
+
+pool:
+  name: Development
+
+stages:
+  - stage: 'Deployment'
+    displayName: 'Provisioning Core Infrrastructure'
+    jobs:
+    - job: 'Deployment'
+      displayName: 'Deploy development and CI/CD infrastructure'
+      pool: Development
+      variables: {}
+      steps:
+      - script: >-
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          && helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+          && helm repo add stable https://charts.helm.sh/stable
+          && helm repo add bitnami https://charts.bitnami.com/bitnami
+          && helm repo add harbor https://helm.goharbor.io
+          && helm repo add aws https://aws.github.io/eks-charts
+        displayName: 'Add required Helm repos'
+
+      - script: >-
+          helm upgrade dashboard kubernetes-dashboard/kubernetes-dashboard
+          --install
+          --wait
+          --create-namespace
+          --cleanup-on-fail
+          --namespace default
+          --wait
+          --wait-for-jobs
+          --version 4.0.2
+          -f k8s-dashboard-values.yml
+        workingDirectory: local-baremetal/core
+        displayName: 'Install/Upgrade k8s-dashboard'
+
+      - script: >-
+          helm upgrade harbor-1617043966 harbor/harbor
+          --install
+          --wait
+          --create-namespace
+          --cleanup-on-fail
+          --namespace default
+          --wait
+          --wait-for-jobs
+          --version 1.6.0
+          -f harbor-values.yml
+        workingDirectory: local-baremetal/core
+        displayName: 'Install/Upgrade harbor registry'
+
+      - script: >-
+          helm upgrade local-ingress ingress-nginx/ingress-nginx
+          --install
+          --wait
+          --create-namespace
+          --cleanup-on-fail
+          --namespace default
+          --wait
+          --wait-for-jobs
+          --version 3.25.0
+          -f nginx-ingress-values.yml
+        workingDirectory: local-baremetal/core
+        displayName: 'Install/Upgrade NGINX Ingress controller'
+
+      - script: >-
+          helm upgrade metrics-server-1617042143 bitnami/metrics-server
+          --install
+          --wait
+          --create-namespace
+          --cleanup-on-fail
+          --namespace default
+          --wait
+          --wait-for-jobs
+          --version 5.8.1
+          -f metrics-server-values.yml
+        workingDirectory: local-baremetal/core
+        displayName: 'Install/Upgrade k8s metrics-server'

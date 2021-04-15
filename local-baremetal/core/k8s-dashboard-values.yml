@@ -1,0 +1,75 @@
+affinity: {}
+annotations: {}
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 2001
+  runAsUser: 1001
+extraEnv: []
+extraVolumeMounts: []
+extraVolumes: []
+image:
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+  repository: kubernetesui/dashboard
+  tag: v2.2.0
+ingress:
+  customPaths: []
+  enabled: true
+  hosts:
+  - k8s.dashboard
+  paths:
+  - /
+labels: {}
+livenessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 30
+metrics-server:
+  enabled: false
+metricsScraper:
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsGroup: 2001
+    runAsUser: 1001
+  enabled: true
+  image:
+    repository: kubernetesui/metrics-scraper
+    tag: v1.0.6
+  resources: {}
+networkPolicy:
+  enabled: false
+nodeSelector: {}
+pinnedCRDs: []
+podAnnotations:
+  seccomp.security.alpha.kubernetes.io/pod: runtime/default
+podDisruptionBudget:
+  enabled: false
+podLabels: {}
+podSecurityPolicy:
+  enabled: false
+protocolHttp: true
+rbac:
+  clusterReadOnlyRole: false
+  clusterRoleMetrics: true
+  create: true
+replicaCount: 1
+resources:
+  limits:
+    cpu: 200m
+    memory: 200Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
+service:
+  annotations: {}
+  clusterServiceLabel:
+    enabled: true
+    key: kubernetes.io/cluster-service
+  externalPort: 443
+  labels: {}
+  type: NodePort
+serviceAccount:
+  create: true
+settings: {}
+tolerations: []
